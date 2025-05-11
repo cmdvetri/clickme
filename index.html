@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cyber Awareness</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: black;
+      font-family: 'Courier New', Courier, monospace;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,0,0,0.02) 0px,
+        rgba(255,0,0,0.02) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      z-index: 1;
+      animation: flicker 0.15s infinite;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.8; }
+      100% { opacity: 1; }
+    }
+
+    #warning, #message {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 2;
+    }
+
+    #warning {
+      color: red;
+      font-size: 8em;
+      animation: glitch 0.7s infinite;
+    }
+
+    #message {
+      color: white;
+      font-size: 4em;
+      display: none;
+      white-space: pre-line;
+    }
+
+    @keyframes glitch {
+      0% { text-shadow: 2px 0 red, -2px 0 cyan; }
+      20% { text-shadow: -2px 0 red, 2px 0 cyan; }
+      40% { text-shadow: 2px 2px red, -2px -2px cyan; }
+      60% { text-shadow: -2px -2px red, 2px 2px cyan; }
+      80% { text-shadow: 2px 0 red, -2px 0 cyan; }
+      100% { text-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="warning">YOUR DEVICE HAS BEEN HACKED!</div>
+  <div id="message"></div>
+
+  <audio id="alarm" src="cyber_alarm.mp3" preload="auto" loop></audio>
+  <audio id="typeSound" src="https://assets.mixkit.co/sfx/preview/mixkit-typewriter-soft-click-1125.mp3" preload="auto"></audio>
+
+  <script>
+    const fullText = "Don't be quick to click.\nDon't be a victim.\n– Tamil_Nadu_Police.\n Cyber_Crime_Wing";
+    let clickCount = 0;
+
+    document.body.addEventListener('click', () => {
+      clickCount++;
+
+      if (clickCount === 1) {
+        // Replay warning and play alarm
+        document.getElementById('warning').style.display = 'block';
+        const alarm = document.getElementById('alarm');
+        alarm.play().catch(err => console.warn("Alarm autoplay blocked:", err));
+      } 
+      else if (clickCount === 2) {
+        // Stop alarm and show message
+        const alarm = document.getElementById('alarm');
+        alarm.pause();
+        alarm.currentTime = 0;
+
+        document.getElementById('warning').style.display = 'none';
+
+        const messageDiv = document.getElementById('message');
+        const typeSound = document.getElementById('typeSound');
+        messageDiv.style.display = 'block';
+
+        let i = 0;
+        function typeWriter() {
+          if (i < fullText.length) {
+            messageDiv.innerHTML += fullText.charAt(i);
+            if (fullText.charAt(i) !== ' ' && fullText.charAt(i) !== '\n') {
+              typeSound.currentTime = 0;
+              typeSound.play();
+            }
+            i++;
+            setTimeout(typeWriter, 50);
+          }
+        }
+        typeWriter();
+      }
+    });
+  </script>
+
+</body>
+</html>
